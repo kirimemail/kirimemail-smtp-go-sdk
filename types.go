@@ -236,6 +236,43 @@ type LogEntry struct {
 	Timestamp      int64  `json:"timestamp"`
 }
 
+const (
+	LogEventTypeQueued        = "queued"
+	LogEventTypeSend          = "send"
+	LogEventTypeDelivered     = "delivered"
+	LogEventTypeBounced       = "bounced"
+	LogEventTypeFailed        = "failed"
+	LogEventTypeOpened        = "opened"
+	LogEventTypeClicked       = "clicked"
+	LogEventTypeUnsubscribed  = "unsubscribed"
+	LogEventTypeTemporaryFail = "temporary_fail"
+	LogEventTypePermanentFail = "permanent_fail"
+	LogEventTypeDeferred      = "deferred"
+)
+
+var LogEventTypes = []string{
+	LogEventTypeQueued,
+	LogEventTypeSend,
+	LogEventTypeDelivered,
+	LogEventTypeBounced,
+	LogEventTypeFailed,
+	LogEventTypeOpened,
+	LogEventTypeClicked,
+	LogEventTypeUnsubscribed,
+	LogEventTypeTemporaryFail,
+	LogEventTypePermanentFail,
+	LogEventTypeDeferred,
+}
+
+func IsValidLogEventType(eventType string) bool {
+	for _, et := range LogEventTypes {
+		if et == eventType {
+			return true
+		}
+	}
+	return false
+}
+
 type LogListResponse struct {
 	Data       []LogEntry `json:"data"`
 	Count      int        `json:"count"`

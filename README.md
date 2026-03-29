@@ -259,7 +259,7 @@ import (
 // Get logs with filters
 limit := 100
 offset := 0
-logs, err := client.Logs().Get("example.com", nil, nil, nil, nil, &limit, &offset)
+logs, err := client.Logs().Get("example.com", nil, nil, nil, nil, nil, nil, nil, &limit, &offset)
 if err != nil {
     log.Fatal(err)
 }
@@ -268,13 +268,33 @@ fmt.Printf("Found %d log entries\n", len(logs.Data))
 // Filter by date range
 start := "2024-01-01T00:00:00Z"
 end := "2024-12-31T23:59:59Z"
-logs, err := client.Logs().Get("example.com", &start, &end, nil, nil, nil, nil)
+logs, err := client.Logs().Get("example.com", &start, &end, nil, nil, nil, nil, nil, nil, nil)
 
 // Filter by sender/recipient
 logs, err := client.Logs().Get("example.com", nil, nil, 
     smtpsdk.StringPtr("sender@example.com"), 
     smtpsdk.StringPtr("recipient@example.com"), 
-    nil, nil)
+    nil, nil, nil, nil)
+
+// Filter by event type
+logs, err = client.Logs().GetByEventType("example.com", smtpsdk.LogEventTypeDelivered, nil, nil, nil, nil, nil, nil, nil, nil)
+
+// Filter by tags
+logs, err = client.Logs().GetByTags("example.com", "newsletter", nil, nil, nil, nil, nil, nil, nil, nil)
+
+// Filter by subject (partial match)
+logs, err = client.Logs().Get("example.com", nil, nil, nil, nil, smtpsdk.StringPtr("Welcome"), nil, nil, nil, nil)
+
+// Combined filters
+eventType := smtpsdk.LogEventTypeOpened
+tags := "campaign-2024"
+logs, err = client.Logs().Get("example.com", &start, &end, 
+    smtpsdk.StringPtr("sender@example.com"), 
+    smtpsdk.StringPtr("recipient@example.com"),
+    smtpsdk.StringPtr("Welcome"),
+    &eventType,
+    &tags,
+    &limit, &offset)
 
 // Get logs for specific message
 logEntry, err := client.Logs().GetMessage("example.com", "message-guid")
@@ -285,7 +305,7 @@ if len(logEntry.Data) > 0 {
 }
 
 // Stream logs (Server-Sent Events)
-resp, err := client.Logs().Stream("example.com", nil, nil, nil, nil, nil)
+resp, err := client.Logs().Stream("example.com", nil, nil, nil, nil, nil, nil, nil, nil)
 if err != nil {
     log.Fatal(err)
 }
@@ -593,4 +613,5 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Version History
 
+- **v1.3.0** - Added event_type and tags filter support for log retrieval
 - **v1.0.0** - Initial release with full API support
