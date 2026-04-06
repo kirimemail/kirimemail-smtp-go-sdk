@@ -134,56 +134,47 @@ func (s *SuppressionsService) CreateWhitelist(domain string, req WhitelistCreate
 	return &result, nil
 }
 
-func (s *SuppressionsService) DeleteUnsubscribes(domain string, ids []int) (*SuppressionDeleteResponse, error) {
+func (s *SuppressionsService) DeleteUnsubscribes(domain string, ids []int) error {
 	req := SuppressionDeleteRequest{IDs: ids}
 
-	resp, err := s.client.doDelete(fmt.Sprintf("/api/domains/%s/suppressions/unsubscribes", domain))
+	resp, err := s.client.doDeleteWithBody(fmt.Sprintf("/api/domains/%s/suppressions/unsubscribes", domain), req)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	var result SuppressionDeleteResponse
-	if err := s.client.decodeResponse(resp, &result); err != nil {
-		return nil, err
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("request failed with status %d", resp.StatusCode)
 	}
 
-	_ = req
-
-	return &result, nil
+	return nil
 }
 
-func (s *SuppressionsService) DeleteBounces(domain string, ids []int) (*SuppressionDeleteResponse, error) {
+func (s *SuppressionsService) DeleteBounces(domain string, ids []int) error {
 	req := SuppressionDeleteRequest{IDs: ids}
 
-	resp, err := s.client.doDelete(fmt.Sprintf("/api/domains/%s/suppressions/bounces", domain))
+	resp, err := s.client.doDeleteWithBody(fmt.Sprintf("/api/domains/%s/suppressions/bounces", domain), req)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	var result SuppressionDeleteResponse
-	if err := s.client.decodeResponse(resp, &result); err != nil {
-		return nil, err
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("request failed with status %d", resp.StatusCode)
 	}
 
-	_ = req
-
-	return &result, nil
+	return nil
 }
 
-func (s *SuppressionsService) DeleteWhitelists(domain string, ids []int) (*SuppressionDeleteResponse, error) {
+func (s *SuppressionsService) DeleteWhitelists(domain string, ids []int) error {
 	req := SuppressionDeleteRequest{IDs: ids}
 
-	resp, err := s.client.doDelete(fmt.Sprintf("/api/domains/%s/suppressions/whitelist", domain))
+	resp, err := s.client.doDeleteWithBody(fmt.Sprintf("/api/domains/%s/suppressions/whitelist", domain), req)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	var result SuppressionDeleteResponse
-	if err := s.client.decodeResponse(resp, &result); err != nil {
-		return nil, err
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("request failed with status %d", resp.StatusCode)
 	}
 
-	_ = req
-
-	return &result, nil
+	return nil
 }

@@ -138,7 +138,7 @@ type TracklinkSetupResponse struct {
 
 type TracklinkVerificationResponse struct {
 	Records struct {
-		CNAME          string `json:"cname"`
+		CNAME          bool   `json:"cname"`
 		TrackingDomain string `json:"tracking_domain"`
 	} `json:"records"`
 }
@@ -182,12 +182,14 @@ type EmailValidationBatchSummary struct {
 	Validated int `json:"validated"`
 }
 
+type EmailValidationBatchResult struct {
+	Results []EmailValidationResult     `json:"results"`
+	Summary EmailValidationBatchSummary `json:"summary"`
+}
+
 type EmailValidationBatchResponse struct {
 	APIResponse
-	Data struct {
-		Results []EmailValidationResult     `json:"results"`
-		Summary EmailValidationBatchSummary `json:"summary"`
-	} `json:"data"`
+	Data EmailValidationBatchResult `json:"data"`
 }
 
 type MessageSendRequest struct {

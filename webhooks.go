@@ -76,18 +76,17 @@ func (s *WebhooksService) Update(domain, webhookGUID string, req WebhookUpdateRe
 	return &result, nil
 }
 
-func (s *WebhooksService) Delete(domain, webhookGUID string) (*APIResponse, error) {
+func (s *WebhooksService) Delete(domain, webhookGUID string) error {
 	resp, err := s.client.doDelete(fmt.Sprintf("/api/domains/%s/webhooks/%s", domain, webhookGUID))
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	var result APIResponse
-	if err := s.client.decodeResponse(resp, &result); err != nil {
-		return nil, err
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("request failed with status %d", resp.StatusCode)
 	}
 
-	return &result, nil
+	return nil
 }
 
 func (s *WebhooksService) Test(domain string, req WebhookTestRequest) (*WebhookTestResponse, error) {

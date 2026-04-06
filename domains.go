@@ -83,18 +83,17 @@ func (s *DomainsService) Update(domain string, req DomainUpdateRequest) (*Domain
 	return &result, nil
 }
 
-func (s *DomainsService) Delete(domain string) (*APIResponse, error) {
+func (s *DomainsService) Delete(domain string) error {
 	resp, err := s.client.doDelete(fmt.Sprintf("/api/domains/%s", domain))
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	var result APIResponse
-	if err := s.client.decodeResponse(resp, &result); err != nil {
-		return nil, err
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("request failed with status %d", resp.StatusCode)
 	}
 
-	return &result, nil
+	return nil
 }
 
 func (s *DomainsService) SetupAuthDomain(domain string, req AuthDomainSetupRequest) (*AuthDomainSetupResponse, error) {
@@ -165,4 +164,30 @@ func (s *DomainsService) VerifyTracklink(domain string) (*TracklinkVerificationR
 	}
 
 	return &result, nil
+}
+
+func (s *DomainsService) DeleteAuthDomain(domain string) error {
+	resp, err := s.client.doDelete(fmt.Sprintf("/api/domains/%s/auth-domain", domain))
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("request failed with status %d", resp.StatusCode)
+	}
+
+	return nil
+}
+
+func (s *DomainsService) DeleteTracklink(domain string) error {
+	resp, err := s.client.doDelete(fmt.Sprintf("/api/domains/%s/tracklink", domain))
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("request failed with status %d", resp.StatusCode)
+	}
+
+	return nil
 }

@@ -66,18 +66,17 @@ func (s *CredentialsService) Get(domain, credentialGUID string) (*Credential, er
 	return &result.Data, nil
 }
 
-func (s *CredentialsService) Delete(domain, credentialGUID string) (*APIResponse, error) {
+func (s *CredentialsService) Delete(domain, credentialGUID string) error {
 	resp, err := s.client.doDelete(fmt.Sprintf("/api/domains/%s/credentials/%s", domain, credentialGUID))
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	var result APIResponse
-	if err := s.client.decodeResponse(resp, &result); err != nil {
-		return nil, err
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("request failed with status %d", resp.StatusCode)
 	}
 
-	return &result, nil
+	return nil
 }
 
 func (s *CredentialsService) ResetPassword(domain, credentialGUID string) (*CredentialResetPasswordResponse, error) {

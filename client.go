@@ -98,6 +98,14 @@ func (c *Client) doDelete(path string) (*http.Response, error) {
 	return c.doRequest("DELETE", path, nil, "")
 }
 
+func (c *Client) doDeleteWithBody(path string, body interface{}) (*http.Response, error) {
+	jsonBody, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	return c.doRequest("DELETE", path, bytes.NewReader(jsonBody), "application/json")
+}
+
 func (c *Client) doMultipartRequest(path string, fields map[string]interface{}, files map[string][]byte) (*http.Response, error) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
