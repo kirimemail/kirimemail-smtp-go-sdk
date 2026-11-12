@@ -146,3 +146,81 @@ func TestHeadersUnmarshal(t *testing.T) {
 		t.Errorf("X-Another = %v, want another-value", headers["X-Another"])
 	}
 }
+
+func TestMessageSendResponse_WithMessages(t *testing.T) {
+	data := []byte(`{
+		"success": true,
+		"message": "Email send jobs dispatched for 2 recipient(s)",
+		"messages": [
+			{"to": "user1@example.com", "message_guid": "0193f3c4-aaaa-bbbb-cccc-000000000001"},
+			{"to": "user2@example.com", "message_guid": "0193f3c4-aaaa-bbbb-cccc-000000000002"}
+		]
+	}`)
+
+	var resp smtpsdk.MessageSendResponse
+	if err := json.Unmarshal(data, &resp); err != nil {
+		t.Fatalf("MessageSendResponse unmarshal error = %v", err)
+	}
+
+	if !resp.Success {
+		t.Errorf("Success = false, want true")
+	}
+	if len(resp.Messages) != 2 {
+		t.Fatalf("len(Messages) = %d, want 2", len(resp.Messages))
+	}
+	if resp.Messages[0].To != "user1@example.com" {
+		t.Errorf("Messages[0].To = %v, want user1@example.com", resp.Messages[0].To)
+	}
+	if resp.Messages[0].MessageGUID != "0193f3c4-aaaa-bbbb-cccc-000000000001" {
+		t.Errorf("Messages[0].MessageGUID = %v, want 0193f3c4-aaaa-bbbb-cccc-000000000001", resp.Messages[0].MessageGUID)
+	}
+}
+
+func TestMessageSendResponse_WithoutMessages(t *testing.T) {
+	data := []byte(`{"success": true, "message": "Email sent"}`)
+
+	var resp smtpsdk.MessageSendResponse
+	if err := json.Unmarshal(data, &resp); err != nil {
+		t.Fatalf("MessageSendResponse unmarshal error = %v", err)
+	}
+
+	if !resp.Success {
+		t.Errorf("Success = false, want true")
+	}
+	if resp.Messages != nil {
+		t.Errorf("Messages = %v, want nil for backward compatibility", resp.Messages)
+	}
+}
+
+func TestMessageTemplateResponse_WithMessages(t *testing.T) {
+	data := []byte(`{
+		"success": true,
+		"message": "Template-based email jobs dispatched for 1 recipient(s)",
+		"template_guid": "550e8400-e29b-41d4-a716-446655440000",
+		"template_name": "Welcome Email",
+		"messages": [
+			{"to": "user@example.com", "message_guid": "0193f3c4-aaaa-bbbb-cccc-000000000003"}
+		]
+	}`)
+
+	var resp smtpsdk.MessageTemplateResponse
+	if err := json.Unmarshal(data, &resp); err != nil {
+		t.Fatalf("MessageTemplateResponse unmarshal error = %v", err)
+	}
+
+	if !resp.Success {
+		t.Errorf("Success = false, want true")
+	}
+	if resp.TemplateGUID != "550e8400-e29b-41d4-a716-446655440000" {
+		t.Errorf("TemplateGUID = %v, want 550e8400-e29b-41d4-a716-446655440000", resp.TemplateGUID)
+	}
+	if len(resp.Messages) != 1 {
+		t.Fatalf("len(Messages) = %d, want 1", len(resp.Messages))
+	}
+	if resp.Messages[0].To != "user@example.com" {
+		t.Errorf("Messages[0].To = %v, want user@example.com", resp.Messages[0].To)
+	}
+	if resp.Messages[0].MessageGUID != "0193f3c4-aaaa-bbbb-cccc-000000000003" {
+		t.Errorf("Messages[0].MessageGUID = %v, want 0193f3c4-aaaa-bbbb-cccc-000000000003", resp.Messages[0].MessageGUID)
+	}
+}

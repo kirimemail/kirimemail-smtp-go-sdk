@@ -205,9 +205,18 @@ type MessageSendRequest struct {
 	AttachmentOptions string      `json:"attachment_options,omitempty"`
 }
 
+// MessageRecipient is the per-recipient delivery identifier returned when an
+// email is accepted for sending. The same GUID is also sent as the
+// X-Message-Guid header on each email for delivery tracking and log correlation.
+type MessageRecipient struct {
+	To          string `json:"to"`
+	MessageGUID string `json:"message_guid"`
+}
+
 type MessageSendResponse struct {
 	APIResponse
-	Message string `json:"message"`
+	Message  string             `json:"message"`
+	Messages []MessageRecipient `json:"messages,omitempty"`
 }
 
 type MessageTemplateRequest struct {
@@ -224,9 +233,10 @@ type MessageTemplateRequest struct {
 
 type MessageTemplateResponse struct {
 	APIResponse
-	Message      string `json:"message"`
-	TemplateGUID string `json:"template_guid,omitempty"`
-	TemplateName string `json:"template_name,omitempty"`
+	Message      string             `json:"message"`
+	TemplateGUID string             `json:"template_guid,omitempty"`
+	TemplateName string             `json:"template_name,omitempty"`
+	Messages     []MessageRecipient `json:"messages,omitempty"`
 }
 
 type LogEntry struct {
